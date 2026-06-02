@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
+import { BrowserRouter, Link, Navigate, Route, Routes } from "react-router-dom";
 
 import type { Post } from "./types/post";
 import { getPosts } from "./api/postApi";
 
-import SignupForm from "./components/SignupForm";
-import LoginForm from "./components/LoginForm";
-import PostForm from "./components/PostForm";
-import PostList from "./components/PostList";
+import AuthPage from "./pages/AuthPage";
+import HomePage from "./pages/HomePage";
 
 import "./App.css";
 
@@ -61,34 +60,49 @@ function App() {
   }, []);
 
   return (
-    <div className="app">
-      <header className="header">
-        <h1>{serviceName}</h1>
-        <p>나의 개발 기록 공간</p>
-      </header>
+    <BrowserRouter>
+      <div className="app">
+        <header className="header">
+          <h1>{serviceName}</h1>
+          <p>개발 기록 공간</p>
 
-      <main className="main">
-        <SignupForm />
+          <nav className="nav">
+            <Link to="/">메인</Link>
+            <Link to="/auth">회원가입 / 로그인</Link>
+          </nav>
+        </header>
 
-        <LoginForm
-          token={token}
-          onLoginSuccess={handleLoginSuccess}
-          onLogout={handleLogout}
-        />
+        <main className="main">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <HomePage
+                  token={token}
+                  posts={posts}
+                  loading={loading}
+                  error={error}
+                  onPostCreated={handlePostCreated}
+                />
+              }
+            />
 
-        <PostForm token={token} onPostCreated={handlePostCreated} />
+            <Route
+              path="/auth"
+              element={
+                <AuthPage
+                  token={token}
+                  onLoginSuccess={handleLoginSuccess}
+                  onLogout={handleLogout}
+                />
+              }
+            />
 
-        <section className="card">
-          <h2>공부 기록</h2>
-
-          {loading && <p>게시글을 불러오는 중입니다...</p>}
-
-          {error && <p className="error-message">{error}</p>}
-
-          {!loading && !error && <PostList posts={posts} />}
-        </section>
-      </main>
-    </div>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
   );
 }
 
