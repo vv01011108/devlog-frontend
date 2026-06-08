@@ -3,7 +3,7 @@ import SignupForm from "../components/SignupForm";
 
 type AuthPageProps = {
   token: string;
-  onLoginSuccess: (accessToken: string) => void;
+  onLoginSuccess: (accessToken: string, userId: number) => void;
   onLogout: () => void;
 };
 

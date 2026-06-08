@@ -6,6 +6,8 @@ import { getPosts } from "./api/postApi";
 
 import AuthPage from "./pages/AuthPage";
 import HomePage from "./pages/HomePage";
+import PostDetailPage from "./pages/PostDetailPage";
+import PostEditPage from "./pages/PostEditPage";
 
 import "./App.css";
 
@@ -20,18 +22,42 @@ function App() {
     localStorage.getItem("accessToken") ?? "",
   );
 
-  const handleLoginSuccess = (accessToken: string) => {
+  const storedUserId = localStorage.getItem("currentUserId");
+
+  const [currentUserId, setCurrentUserId] = useState<number | null>(
+    storedUserId ? Number(storedUserId) : null,
+  );
+
+  const handleLoginSuccess = (accessToken: string, userId: number) => {
     localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("currentUserId", String(userId));
+
     setToken(accessToken);
+    setCurrentUserId(userId);
   };
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("currentUserId");
+
     setToken("");
+    setCurrentUserId(null);
   };
 
   const handlePostCreated = (createdPost: Post) => {
     setPosts((prevPosts) => [createdPost, ...prevPosts]);
+  };
+
+  const handlePostDeleted = (postId: number) => {
+    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+  };
+
+  const handlePostUpdated = (updatedPost: Post) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === updatedPost.id ? updatedPost : post,
+      ),
+    );
   };
 
   useEffect(() => {
@@ -64,7 +90,7 @@ function App() {
       <div className="app">
         <header className="header">
           <h1>{serviceName}</h1>
-          <p>개발 기록 공간</p>
+          <p>기록 공간</p>
 
           <nav className="nav">
             <Link to="/">메인</Link>
@@ -95,6 +121,24 @@ function App() {
                   onLoginSuccess={handleLoginSuccess}
                   onLogout={handleLogout}
                 />
+              }
+            />
+
+            <Route
+              path="/posts/:postId"
+              element={
+                <PostDetailPage
+                  token={token}
+                  currentUserId={currentUserId}
+                  onPostDeleted={handlePostDeleted}
+                />
+              }
+            />
+
+            <Route
+              path="/posts/:postId/edit"
+              element={
+                <PostEditPage token={token} onPostUpdated={handlePostUpdated} />
               }
             />
 

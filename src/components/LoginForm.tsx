@@ -3,7 +3,7 @@ import { login } from "../api/authApi";
 
 type LoginFormProps = {
   token: string;
-  onLoginSuccess: (accessToken: string) => void;
+  onLoginSuccess: (accessToken: string, userId: number) => void;
   onLogout: () => void;
 };
 
@@ -15,8 +15,7 @@ function LoginForm({ token, onLoginSuccess, onLogout }: LoginFormProps) {
   const handleLogin = async () => {
     try {
       const data = await login(email, password);
-
-      onLoginSuccess(data.accessToken);
+      onLoginSuccess(data.accessToken, data.userId);
       setLoginMessage("로그인 성공");
       setEmail("");
       setPassword("");
