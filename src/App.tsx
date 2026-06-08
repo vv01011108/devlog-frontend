@@ -138,7 +138,11 @@ function App() {
             <Route
               path="/posts/:postId/edit"
               element={
-                <PostEditPage token={token} onPostUpdated={handlePostUpdated} />
+                <PostEditPage
+                  token={token}
+                  currentUserId={currentUserId}
+                  onPostUpdated={handlePostUpdated}
+                />
               }
             />
 
